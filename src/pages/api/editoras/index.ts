@@ -1,28 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
-interface Editora {
-  codEditora: number;
-  nome: string;
-}
-
-class ControleEditora<T extends Editora> {
-  editoras: T[] = [
-    { "codEditora": 1, "nome": "Alta Books" } as T,
-    { "codEditora": 2, "nome": "Bookman" } as T,
-    { "codEditora": 3, "nome": "Addison Wesley" } as T,
-    { "codEditora": 4, "nome": "Pearson" } as T,
-    // Add more publishers as needed
-  ];
-
-  getEditoras(): T[] {
-    return this.editoras;
-  }
-
-  getNomeEditora(codEditora: number): string | null {
-    const editora = this.editoras.find(editora => editora.codEditora === codEditora);
-    return editora ? editora.nome : null;
-  }
-}
+import { ControleEditora } from '../../../../classes/controle/ControleEditora'; 
 
 export const controleEditora = new ControleEditora();
 

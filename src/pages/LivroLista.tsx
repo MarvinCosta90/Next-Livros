@@ -1,37 +1,82 @@
 import type { NextPage } from 'next'
-import React from 'react';
-import { ControleEditora } from '../../classes/controle/ControleEditora';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
+import { Livro } from '../../classes/modelo/Livro';
+import Head from 'next/head';
+import { LinhaLivro } from '../../componentes/LinhaLivro'; 
 
+const LivroLista: NextPage = () => { 
+  const [livros, setLivros] = useState<Array<Livro>>([]);
+  const [carregando, setCarregando] = useState(true);
 
-interface Livro {
-    codigo: number;
-    titulo: string;
-    autor: string;
-    codEditora: number;
+  const baseURL = "http://localhost:3000/api/livros";
+
+  const getLivros = async () => {
+    setCarregando(true)
+    try {
+      const response = await fetch(baseURL);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setLivros(data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+    setCarregando(false)
+  };
+
+  const deleteLivro = async (code:number | string) => {
+    if (carregando){
+      return
+    }
+    setCarregando(true)
+    try {
+      const response = await fetch(`${baseURL}/${code}`, {
+        method: 'DELETE'
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      getLivros()
+      alert('Livro excluído com sucesso')
+    } catch (error) {
+      alert("Error deleting livro");
+    }
+    setCarregando(false)
+  };
+
+  const handleDeleteLivro =  (code:number | string) => { 
+    deleteLivro(code)
   }
-  
-  interface LinhaLivroProps {
-    livro: Livro;
-    excluir: (codigo: number) => void;
-  }
 
-  
-  
-export default function LinhaLivro() {
+  useEffect(() => {
+    getLivros();
+  }, []);
 
-    const controleEditora = ControleEditora
-    const nomeEditora = controleEditora.getNomeEditora(1)
+  return ( 
+  <div className="container pt-5">
+    <Head>
+        <title>Catálogo</title>
+    </Head> 
+    <table className="table table-striped">
+      <thead className="table-dark">
+        <tr>
+          <th>Título</th>
+          <th>Resumo</th>
+          <th>Editora</th>
+          <th>Autores</th>
+        </tr>
+      </thead>
+      <tbody>
+        {livros.map((livro, index) => (
+          <LinhaLivro key={index} livro={livro} excluir={handleDeleteLivro} />
+        ))}
+      </tbody>
+    </table>
+  </div>
+) }
 
-  console.log(nomeEditora)
 
-  return (<div>test</div>
-    /*<tr>
-      <td>{livro.titulo}</td>
-      <td>{livro.autor}</td>
-      <td>{nomeEditora || 'Editora Desconhecida'}</td>
-      <td>
-        <button onClick={() => excluir(livro.codigo)}>Excluir</button>
-      </td>
-    </tr>*/
-  );
-};
+export default LivroLista;

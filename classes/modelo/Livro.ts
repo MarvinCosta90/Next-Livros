@@ -1,6 +1,9 @@
+import { Editora } from "./Editora";
+
 export class Livro {
     codigo: number;
-    codEditora: number;
+    codEditora: number | string;
+    editora?: Editora | null | undefined;
     titulo: string;
     resumo: string;
     autores: string[];
